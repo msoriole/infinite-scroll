@@ -5,14 +5,19 @@ let ready = false;
 let imagesLoaded = 0;
 let totalImages = 0;
 let photosArray = [];
-let initialLoaded = false;
+let isInitialLoaded = false;
 
 // Unsplash API
 const apiKey = "oUuFPwAI2LiJUTFjEaJOT6sBdd6SqzrOqzYC8-7V5aA";
-let countInitial = 5;
-let apiUrlInitial = `https://api.unsplash.com/photos/random/?client_id=${apiKey}&count=${countInitial}`; 
-let count = 30;
-let apiUrl = `https://api.unsplash.com/photos/random/?client_id=${apiKey}&count=${count}`;
+const countInitial = 5;
+let apiUrl = `https://api.unsplash.com/photos/random/?client_id=${apiKey}&count=${countInitial}`; 
+const picCount = 30;
+
+// Update apiUrl with new count
+function updateAPIUrl(picCount) {
+    apiUrl = `https://api.unsplash.com/photos/random/?client_id=${apiKey}&count=${picCount}`;
+
+}
 
 // Check if all images were loaded
 function imageLoaded() {
@@ -20,10 +25,7 @@ function imageLoaded() {
     imagesLoaded++;
     if (imagesLoaded === totalImages) {
         ready = true;
-        imagesLoaded = 0;
         loader.hidden = true;
-        console.log("ready = ", ready);
-        initialLoaded = true;
     }
 }
 
@@ -37,6 +39,7 @@ function setAttributes(element, attributes) {
 // Create Elements For Links & Photos, Add to DOM
 function displayPhotos() {
     totalImages = photosArray.length;
+    imagesLoaded = 0;
     console.log("total images: ", totalImages);
     // Run function for each object in photoArray
     photosArray.forEach((photo) => {
@@ -67,16 +70,13 @@ function displayPhotos() {
 // Get photos from Unsplash API
 async function getPhotos() {
     try {
-        let response;
-        if (!initialLoaded) {
-            console.log("initial");
-            response = await fetch(apiUrlInitial);
-        } else {
-            console.log("initial fineshed");
-            response = await fetch(apiUrl);
-        }
+        const response = await fetch(apiUrl);
         photosArray = await response.json();
         displayPhotos();
+        if (!isInitialLoaded) {
+            updateAPIUrl(picCount);
+        }
+        isInitialLoaded = true;
        //console.log(photosArray); 
     } catch (error) {
        // Catch ERROR here 
